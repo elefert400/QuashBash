@@ -90,10 +90,10 @@ const char* lookup_env(const char* env_var) {
   // to interpret variables from the command line and display the prompt
   // correctly
   // HINT: This should be pretty simple
-  IMPLEMENT_ME();
-
+  //IMPLEMENT_ME();
+  printf("%s/", env_var);
   // TODO: Remove warning silencers
-  (void) env_var; // Silence unused variable warning
+  //(void) env_var; // Silence unused variable warning
 
   return getenv(env_var);
 }
@@ -141,11 +141,10 @@ void run_generic(GenericCommand cmd) {
   char** args = cmd.args;
 
   // TODO: Remove warning silencers
-  (void) exec; // Silence unused variable warning
-  (void) args; // Silence unused variable warning
+  execvp(exec, args); // Silence unused variable warning
 
   // TODO: Implement run generic
-  IMPLEMENT_ME();
+
 
   perror("ERROR: Failed to execute program");
 }
@@ -192,6 +191,13 @@ void run_cd(CDCommand cmd) {
   if (dir == NULL) {
     perror("ERROR: Failed to resolve path");
     return;
+  }
+  else{
+    get_current_directory(dir);
+    char* env_var = get_current_directory(dir);
+    lookup_env(env_var);
+    //OLD_PWD = dir;
+
   }
 
   // TODO: Change directory
