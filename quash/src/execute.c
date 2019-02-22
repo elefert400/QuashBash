@@ -156,11 +156,11 @@ void run_echo(EchoCommand cmd) {
   char** str = cmd.args;
 
   // TODO: Remove warning silencers
-  (void) str; // Silence unused variable warning
+  //(void) str; // Silence unused variable warning
 
   // TODO: Implement echo
-  IMPLEMENT_ME();
-
+  //IMPLEMENT_ME();
+  printf("%s\n", str);
   // Flush the buffer before returning
   fflush(stdout);
 }
