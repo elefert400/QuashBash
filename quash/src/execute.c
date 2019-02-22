@@ -16,6 +16,8 @@
 #include <unistd.h>
 
 #include <stdlib.h>
+
+#include "deque.h"
 // Remove this and all expansion calls to it
 /**
  * @brief Note calls to any function that requires implementation
@@ -45,16 +47,23 @@ struct job _new_job()
   };
 }
 
+//needs work
 //implement destructor, free process command and destroy process deque
+// struct job _destroy_job()
+// {
+//   free(cmd);
+//   need help destroying deque
+//   PIDDeque new_destructable_PIDDeque(//need size,pid_t)
+// }
 //sets up job deque
-IMPLEMENT_DEQUE_STRUCT(JOBDeque, jobs);
+IMPLEMENT_DEQUE_STRUCT(JOBDeque, job);
 //sets up functions for deque
-IMPLEMENT_DEQUE(JOBDeque, jobs);
+IMPLEMENT_DEQUE(JOBDeque, job);
 //declares job deque, needs to initalize in the start of run_script
 JOBDeque jobs;
 
 //delcaring pipes
-int pipes[2][2]
+int pipes[2][2];
 //ex: pipes[0][1] write end of pipe 0
 //keeps track of which pipe we are using and %2 it to see which pipe we need to use
 int pipeUsed = 0;
@@ -212,7 +221,7 @@ void run_pwd() {
   //used get current directory and free it
   bool* should_free = false;
   char* dbuff = get_current_directory(should_free);
-  printf("%c" dbuff);
+  printf("%s", dbuff);
   free(dbuff);
   // Flush the buffer before returning
   fflush(stdout);
