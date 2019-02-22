@@ -355,15 +355,45 @@ void create_process(CommandHolder holder) {
   bool r_app = holder.flags & REDIRECT_APPEND; // This can only be true if r_out
                                                // is true
 
-  // TODO: Remove warning silencers
-  (void) p_in;  // Silence unused variable warning
-  (void) p_out; // Silence unused variable warning
-  (void) r_in;  // Silence unused variable warning
-  (void) r_out; // Silence unused variable warning
-  (void) r_app; // Silence unused variable warning
+  // // TODO: Remove warning silencers
+  // (void) p_in;  // Silence unused variable warning
+  // (void) p_out; // Silence unused variable warning
+  // (void) r_in;  // Silence unused variable warning
+  // (void) r_out; // Silence unused variable warning
+  // (void) r_app; // Silence unused variable warning
 
   // TODO: Setup pipes, redirects, and new process
-  IMPLEMENT_ME();
+  //IMPLEMENT_ME();
+
+  //attempt 1
+  // if(pid_t > 0)
+  // {
+  //   if(p_in == false)
+  //   {
+  //     pipes[0][0] = holder.cmd;
+  //     p_in = true;
+  //   }
+  //   else
+  //   {
+  //       pipes[1][0] = holder.cmd;
+  //       p_in = false;
+  //   }
+  // }
+  // if(pid_t == 0)
+  // {
+  //   if(p_out == false)
+  //   {
+  //     holder.cmd = pipes[0][1];
+  //     p_out = true;
+  //   }
+  //   else
+  //   {
+  //     holder.cmd = pipes[1][1];
+  //     p_out = false;
+  //   }
+  // }
+
+  
 
   parent_run_command(holder.cmd); // This should be done in the parent branch of
                                   // a fork
