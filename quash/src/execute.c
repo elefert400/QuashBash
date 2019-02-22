@@ -173,12 +173,14 @@ void run_export(ExportCommand cmd) {
   const char* val = cmd.val;
 
   // TODO: Remove warning silencers
-  (void) env_var; // Silence unused variable warning
-  (void) val;     // Silence unused variable warning
+  //(void) env_var; // Silence unused variable warning
+  //(void) val;     // Silence unused variable warning
 
   // TODO: Implement export.
   // HINT: This should be quite simple.
-  IMPLEMENT_ME();
+  //IMPLEMENT_ME();
+  //changes env_var value to val and since parameter 3 is 1 it overwrites it
+  setenv(env_var, val, 1);
 }
 
 // Changes the current working directory
