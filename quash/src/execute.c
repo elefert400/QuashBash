@@ -6,6 +6,7 @@
  *
  * @note As you add things to this file you may want to change the method signature
  */
+#include <limits.h>
 
 #include "execute.h"
 
@@ -14,6 +15,8 @@
 #include "quash.h"
 
 #include <unistd.h>
+
+#include <string.h>
 
 #include <stdlib.h>
 
@@ -76,10 +79,11 @@ char* get_current_directory(bool* should_free) {
   // TODO: Get the current working directory. This will fix the prompt path.
   // HINT: This should be pretty simple
   //IMPLEMENT_ME();
-  char* dbuff = NULL;
-  dbuff = getcwd(NULL, 0);
+  char* dbuff = getcwd(NULL, 0);
   // Change this to true if necessary
-  *should_free = true;
+  /*if (should_free==true){
+    should_free = true;
+  }*/
 
   return dbuff;
 }
@@ -91,11 +95,11 @@ const char* lookup_env(const char* env_var) {
   // correctly
   // HINT: This should be pretty simple
   //IMPLEMENT_ME();
-  printf("%s/", env_var);
+  char* var = getenv(env_var);
   // TODO: Remove warning silencers
   //(void) env_var; // Silence unused variable warning
 
-  return getenv(env_var);
+  return getenv(var);
 }
 
 // Check the status of background jobs
@@ -160,7 +164,12 @@ void run_echo(EchoCommand cmd) {
 
   // TODO: Implement echo
   //IMPLEMENT_ME();
-  printf("%s\n", str);
+  //int size =
+  for(int i = 0; i < sizeof(str);i++){
+    if (str[i] != NULL)
+    printf("%s ", str[i]);
+  }
+  printf("\n");
   // Flush the buffer before returning
   fflush(stdout);
 }
@@ -186,26 +195,23 @@ void run_export(ExportCommand cmd) {
 void run_cd(CDCommand cmd) {
   // Get the directory name
   const char* dir = cmd.dir;
+  //char path[PATH_MAX+1];
 
   // Check if the directory is valid
   if (dir == NULL) {
     perror("ERROR: Failed to resolve path");
     return;
   }
-  else{
-    get_current_directory(dir);
-    char* env_var = get_current_directory(dir);
-    lookup_env(env_var);
-    //OLD_PWD = dir;
-
-  }
-
   // TODO: Change directory
-
+  char realPath[PATH_MAX +1];
+  chdir (realpath(dir, realPath));
   // TODO: Update the PWD environment variable to be the new current working
   // directory and optionally update OLD_PWD environment variable to be the old
   // working directory.
-  IMPLEMENT_ME();
+  //const char* env_var = "PWD";
+  //lookup_env(env_var);
+  //const char* val = cmd.val;
+  //IMPLEMENT_ME();
 }
 
 // Sends a signal to all processes contained in a job
@@ -229,7 +235,7 @@ void run_pwd() {
   //used get current directory and free it
   bool* should_free = false;
   char* dbuff = get_current_directory(should_free);
-  printf("%s", dbuff);
+  printf("\nDirectory:%s \n", dbuff);
   free(dbuff);
   // Flush the buffer before returning
   fflush(stdout);
@@ -354,22 +360,17 @@ void create_process(CommandHolder holder) {
   bool r_out = holder.flags & REDIRECT_OUT;
   bool r_app = holder.flags & REDIRECT_APPEND; // This can only be true if r_out
                                                // is true
-
-  // TODO: Remove warning silencers
-  (void) p_in;  // Silence unused variable warning
-  (void) p_out; // Silence unused variable warning
-  (void) r_in;  // Silence unused variable warning
-  (void) r_out; // Silence unused variable warning
-  (void) r_app; // Silence unused variable warning
-
+  pid_t pid;
   // TODO: Setup pipes, redirects, and new process
-  IMPLEMENT_ME();
-
-  parent_run_command(holder.cmd); // This should be done in the parent branch of
-                                  // a fork
-  child_run_command(holder.cmd); // This should be done in the child branch of a fork
+  pid = fork();
+  if (pid == 0){
+    parent_run_command(holder.cmd);
+    EXIT_SUCCESS;
+  }
+  else{
+    child_run_command(holder.cmd);
+  }
 }
-
 // Run a list of commands
 void run_script(CommandHolder* holders) {
   if (holders == NULL)
@@ -392,12 +393,13 @@ void run_script(CommandHolder* holders) {
   if (!(holders[0].flags & BACKGROUND)) {
     // Not a background Job
     // TODO: Wait for all processes under the job to complete
-    IMPLEMENT_ME();
+    wait(NULL);
   }
   else {
     // A background job.
     // TODO: Push the new job to the job queue
     //figure out new job ID and push it to the back of the job queue and print that the background job has started
+
     IMPLEMENT_ME();
 
     // TODO: Once jobs are implemented, uncomment and fill the following line
