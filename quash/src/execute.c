@@ -430,7 +430,7 @@ void run_script(CommandHolder* holders) {
   }
 
   CommandType type;
-  //declare a new job = curr job;
+  job curr_job = _new_job();
 
   // Run all commands in the `holder` array
   for (int i = 0; (type = get_command_holder_type(holders[i])) != EOC; ++i)
@@ -440,20 +440,26 @@ void run_script(CommandHolder* holders) {
     // Not a background Job
     // TODO: Wait for all processes under the job to complete
     //need another wait (waitpid) to wait the perfect amount of time
-    wait(NULL);
+    while (!is_empty_PIDDeque(&curr_job.process_list)){
+    int status;
+    if(waitpid(peek_back_PIDDeque(&curr_job.process_list), &status, 0 != -1)){
+      pop_back_PIDDeque(&curr_job.process_list);
+      }
+    }
   }
   else {
     // A background job.
-    //int job_id = cmd.job;
-    //push_back_JOBDeque(job_id);
+    curr_job.cmd = get_command_string();
+    //need a global job_id to keep the total number correct.
+    //curr_job.job_id = job_id++;
+    push_back_BG_job(&bg_jobs, curr_job);
 
     // TODO: Push the new job to the job queue
     //figure out new job ID and push it to the back of the job queue and print that the background job has started
 
-    //print_job_bg_start(job_id, pid, cmd);
     IMPLEMENT_ME();
 
     // TODO: Once jobs are implemented, uncomment and fill the following line
-    // print_job_bg_start(job_id, pid, cmd);
+    print_job_bg_start(curr_job.job_id,peek_front_PIDDeque(&curr_job.process_list), curr_job.cmd);
   }
 }
