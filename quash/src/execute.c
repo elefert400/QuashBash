@@ -6,21 +6,24 @@
  *
  * @note As you add things to this file you may want to change the method signature
  */
-#include <limits.h>
-
-#include "execute.h"
-
+#include <stdlib.h>
 #include <stdio.h>
-
-#include "quash.h"
-
+#include <limits.h>
 #include <unistd.h>
-
 #include <string.h>
 
-#include <stdlib.h>
+// open, close and  write to file
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
+#include "execute.h"
+#include "quash.h"
 #include "deque.h"
+
+
+
+
 // Remove this and all expansion calls to it
 /**
  * @brief Note calls to any function that requires implementation
@@ -31,6 +34,7 @@
 //sets up deque struct for processes
 IMPLEMENT_DEQUE_STRUCT(PIDDeque, pid_t);
 //sets up deque functions
+PROTOTYPE_DEQUE(PIDDeque, pid_t);
 IMPLEMENT_DEQUE(PIDDeque, pid_t);
 
 typedef struct job
@@ -59,14 +63,17 @@ struct job _new_job()
 //   PIDDeque new_destructable_PIDDeque(//need size,pid_t)
 // }
 //sets up job deque
-IMPLEMENT_DEQUE_STRUCT(JOBDeque, job);
+IMPLEMENT_DEQUE_STRUCT(BG_job, job);
+PROTOTYPE_DEQUE(BG_job, job);
 //sets up functions for deque
-IMPLEMENT_DEQUE(JOBDeque, job);
+IMPLEMENT_DEQUE(BG_job, job);
+
 //declares job deque, needs to initalize in the start of run_script
-JOBDeque jobs;
+PIDDeque queue;
+BG_job bg_jobs;
 
 //delcaring pipes
-int pipes[2][2];
+int pipes[4][2];
 //ex: pipes[0][1] write end of pipe 0
 //keeps track of which pipe we are using and %2 it to see which pipe we need to use
 int pipeUsed = 0;
@@ -364,12 +371,50 @@ void create_process(CommandHolder holder) {
   // TODO: Setup pipes, redirects, and new process
   pid = fork();
   if (pid == 0){
-    parent_run_command(holder.cmd);
-    EXIT_SUCCESS;
+    //redirect to the same place
+    if(r_in){
+      int in = open(holder.redirect_in, O_RDONLY);
+      dup2(in, STDIN_FILENO);
+      close(in);
+    }
+    //redirect to a file
+    if (r_out){
+      FILE* newFile;
+      //check if it is an appending
+      if(r_app){
+        newFile = fopen(holder.redirect_out, "a");
+      }
+      else{
+        newFile = fopen(holder.redirect_out, "w");
+      }
+      dup2(fileno(newFile), STDOUT_FILENO);
+      //because we are using a file fclose()
+      fclose(newFile);
+    }
+    //if pipe in
+    /*if(p_in){
+      //make a copy
+      //pipe[][0]
+      dup2();
+      close();
+    }*/
+
+    child_run_command(holder.cmd);
+    //destroy the job
+    exit (EXIT_SUCCESS);
   }
   else{
-    child_run_command(holder.cmd);
-  }
+    //check if pipe out
+    /*if(p_out){
+      //pipe[][1]
+      close();
+    }
+    if(p_in){
+      //pipe[][0]
+      close();*/
+      //push the process to the front of the q
+      parent_run_command(holder.cmd);
+    }
 }
 // Run a list of commands
 void run_script(CommandHolder* holders) {
@@ -385,6 +430,7 @@ void run_script(CommandHolder* holders) {
   }
 
   CommandType type;
+  //declare a new job = curr job;
 
   // Run all commands in the `holder` array
   for (int i = 0; (type = get_command_holder_type(holders[i])) != EOC; ++i)
@@ -393,13 +439,18 @@ void run_script(CommandHolder* holders) {
   if (!(holders[0].flags & BACKGROUND)) {
     // Not a background Job
     // TODO: Wait for all processes under the job to complete
+    //need another wait (waitpid) to wait the perfect amount of time
     wait(NULL);
   }
   else {
     // A background job.
+    //int job_id = cmd.job;
+    //push_back_JOBDeque(job_id);
+
     // TODO: Push the new job to the job queue
     //figure out new job ID and push it to the back of the job queue and print that the background job has started
 
+    //print_job_bg_start(job_id, pid, cmd);
     IMPLEMENT_ME();
 
     // TODO: Once jobs are implemented, uncomment and fill the following line
