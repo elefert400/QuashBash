@@ -391,6 +391,7 @@ void create_process(CommandHolder holder) {
       //because we are using a file fclose()
       fclose(newFile);
     }
+    // I have no clue how to do this or any pipe thing SORRY!!!
     //if pipe in
     /*if(p_in){
       //make a copy
@@ -430,6 +431,7 @@ void run_script(CommandHolder* holders) {
   }
 
   CommandType type;
+  //create a new job to hold the current job, call the constructor
   job curr_job = _new_job();
 
   // Run all commands in the `holder` array
@@ -442,7 +444,9 @@ void run_script(CommandHolder* holders) {
     //need another wait (waitpid) to wait the perfect amount of time
     while (!is_empty_PIDDeque(&curr_job.process_list)){
     int status;
+    //-1 will wait untill the child process ends correctly
     if(waitpid(peek_back_PIDDeque(&curr_job.process_list), &status, 0 != -1)){
+      //pop changes the value of the last element in the q while peek does not
       pop_back_PIDDeque(&curr_job.process_list);
       }
     }
@@ -452,6 +456,7 @@ void run_script(CommandHolder* holders) {
     curr_job.cmd = get_command_string();
     //need a global job_id to keep the total number correct.
     //curr_job.job_id = job_id++;
+    //add the background job to the end of the q
     push_back_BG_job(&bg_jobs, curr_job);
 
     // TODO: Push the new job to the job queue
@@ -460,6 +465,7 @@ void run_script(CommandHolder* holders) {
     IMPLEMENT_ME();
 
     // TODO: Once jobs are implemented, uncomment and fill the following line
+    //print the first element in the pid q (which what peek returns)
     print_job_bg_start(curr_job.job_id,peek_front_PIDDeque(&curr_job.process_list), curr_job.cmd);
   }
 }
