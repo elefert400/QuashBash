@@ -367,6 +367,7 @@ void create_process(CommandHolder holder) {
   bool r_out = holder.flags & REDIRECT_OUT;
   bool r_app = holder.flags & REDIRECT_APPEND; // This can only be true if r_out
                                                // is true
+
   pid_t pid;
   // TODO: Setup pipes, redirects, and new process
   pid = fork();
