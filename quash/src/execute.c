@@ -73,7 +73,7 @@ PIDDeque queue;
 BG_job bg_jobs;
 
 //delcaring pipes
-int pipes[4][2];
+int pipes[2][2];
 //ex: pipes[0][1] write end of pipe 0
 //keeps track of which pipe we are using and %2 it to see which pipe we need to use
 int pipeUsed = 0;
@@ -102,11 +102,11 @@ const char* lookup_env(const char* env_var) {
   // correctly
   // HINT: This should be pretty simple
   //IMPLEMENT_ME();
-  char* var = getenv(env_var);
+  //char* var = getenv(env_var);
   // TODO: Remove warning silencers
   //(void) env_var; // Silence unused variable warning
 
-  return getenv(var);
+  return getenv(env_var);
 }
 
 // Check the status of background jobs
@@ -394,12 +394,15 @@ void create_process(CommandHolder holder) {
     }
     // I have no clue how to do this or any pipe thing SORRY!!!
     //if pipe in
-    /*if(p_in){
+    if(p_in){
       //make a copy
       //pipe[][0]
-      dup2();
-      close();
-    }*/
+      close(pipes[pipeUsed % 2][1]);
+      dup2(pipes[pipeUsed % 2][0], STDIN_FILENO)
+      pipeUsed++;
+      close(pipes[pipeUsed % 2][0]);
+      close(pipes[pipeUsed % 2][1]);
+    }
 
     child_run_command(holder.cmd);
     //destroy the job
@@ -407,13 +410,21 @@ void create_process(CommandHolder holder) {
   }
   else{
     //check if pipe out
-    /*if(p_out){
+    if(p_out){
       //pipe[][1]
-      close();
+      close(pipe[pipeUsed % 2][0]);
+      dup2(pipes[pipeUsed % 2][1], STDOUT_FILENO);
+      pipeUsed++;
+      close(pipes[pipeUsed % 2][0]);
+      close(pipes[pipeUsed % 2][1]);
     }
     if(p_in){
       //pipe[][0]
-      close();*/
+      dup2(pipes[pipeUsed % 2][0], STDIN_FILENO);
+      close(pipes[pipeUsed % 2][1]);
+      pipeUsed++;
+      close(pipes[pipeUsed % 2][0]);
+      close(pipes[pipeUsed % 2][1]);
       //push the process to the front of the q
       parent_run_command(holder.cmd);
     }
