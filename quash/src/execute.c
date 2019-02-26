@@ -398,7 +398,7 @@ void create_process(CommandHolder holder) {
       //make a copy
       //pipe[][0]
       close(pipes[pipeUsed % 2][1]);
-      dup2(pipes[pipeUsed % 2][0], STDIN_FILENO)
+      dup2(pipes[pipeUsed % 2][0], STDIN_FILENO);
       pipeUsed++;
       close(pipes[pipeUsed % 2][0]);
       close(pipes[pipeUsed % 2][1]);
@@ -412,7 +412,7 @@ void create_process(CommandHolder holder) {
     //check if pipe out
     if(p_out){
       //pipe[][1]
-      close(pipe[pipeUsed % 2][0]);
+      close(pipes[pipeUsed % 2][0]);
       dup2(pipes[pipeUsed % 2][1], STDOUT_FILENO);
       pipeUsed++;
       close(pipes[pipeUsed % 2][0]);
@@ -428,6 +428,7 @@ void create_process(CommandHolder holder) {
       //push the process to the front of the q
       parent_run_command(holder.cmd);
     }
+}
 }
 // Run a list of commands
 void run_script(CommandHolder* holders) {
