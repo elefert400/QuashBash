@@ -6,6 +6,7 @@
  *
  * @note As you add things to this file you may want to change the method signature
  */
+ //destructor, background status, passing current process into create process
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
@@ -16,7 +17,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <sys/wait.h>
 #include "execute.h"
 #include "quash.h"
 #include "deque.h"
@@ -32,48 +33,55 @@
   fprintf(stderr, "IMPLEMENT ME: %s(line %d): %s()\n", __FILE__, __LINE__, __FUNCTION__)
 
 //sets up deque struct for processes
-IMPLEMENT_DEQUE_STRUCT(PIDDeque, pid_t);
+IMPLEMENT_DEQUE_STRUCT(piddeque, pid_t);
 //sets up deque functions
-PROTOTYPE_DEQUE(PIDDeque, pid_t);
-IMPLEMENT_DEQUE(PIDDeque, pid_t);
+PROTOTYPE_DEQUE(piddeque, pid_t);
+IMPLEMENT_DEQUE(piddeque, pid_t);
 
-typedef struct job
+typedef struct job_t
 {
-  PIDDeque process_list;
+  piddeque process_list;
   int job_id;
   char* cmd;
-}job;
+}job_t;
 
 //jobs contructor
-struct job _new_job()
+static job_t _new_job()
 {
-  return(job){
+  return(job_t){
+    new_piddeque(1),
     0,
     get_command_string(),
-    new_PIDDeque,
   };
 }
 
 //needs work
 //implement destructor, free process command and destroy process deque
-// struct job _destroy_job()
-// {
-//   free(cmd);
-//   need help destroying deque
-//   PIDDeque new_destructable_PIDDeque(//need size,pid_t)
-// }
+static void _destroy_job(job_t b)
+{
+  //getting the size and using it and the destructor to deallocate the process dequeue
+  if(b.cmd == NULL)
+  {
+    //we dont need to free anything if it is null
+  }
+  else
+  {
+    free(b.cmd);
+  }
+  destroy_piddeque(&b.process_list);
+}
 //sets up job deque
-IMPLEMENT_DEQUE_STRUCT(BG_job, job);
-PROTOTYPE_DEQUE(BG_job, job);
+IMPLEMENT_DEQUE_STRUCT(BG_job, job_t);
+PROTOTYPE_DEQUE(BG_job, job_t);
 //sets up functions for deque
-IMPLEMENT_DEQUE(BG_job, job);
+IMPLEMENT_DEQUE(BG_job, job_t);
 
 //declares job deque, needs to initalize in the start of run_script
-PIDDeque queue;
+piddeque queue;
 BG_job bg_jobs;
 
 //delcaring pipes
-int pipes[4][2];
+int pipes[2][2];
 //ex: pipes[0][1] write end of pipe 0
 //keeps track of which pipe we are using and %2 it to see which pipe we need to use
 int pipeUsed = 0;
@@ -102,11 +110,11 @@ const char* lookup_env(const char* env_var) {
   // correctly
   // HINT: This should be pretty simple
   //IMPLEMENT_ME();
-  char* var = getenv(env_var);
+  //char* var = getenv(env_var);
   // TODO: Remove warning silencers
   //(void) env_var; // Silence unused variable warning
 
-  return getenv(var);
+  return getenv(env_var);
 }
 
 // Check the status of background jobs
@@ -227,11 +235,12 @@ void run_kill(KillCommand cmd) {
   int job_id = cmd.job;
 
   // TODO: Remove warning silencers
-  (void) signal; // Silence unused variable warning
-  (void) job_id; // Silence unused variable warning
+  //(void) signal; // Silence unused variable warning
+  //(void) job_id; // Silence unused variable warning
 
   // TODO: Kill all processes associated with a background job
-  IMPLEMENT_ME();
+  //IMPLEMENT_ME();
+  kill(job_id, signal);
 }
 
 
@@ -394,12 +403,15 @@ void create_process(CommandHolder holder) {
     }
     // I have no clue how to do this or any pipe thing SORRY!!!
     //if pipe in
-    /*if(p_in){
+    if(p_in){
       //make a copy
       //pipe[][0]
-      dup2();
-      close();
-    }*/
+      close(pipes[pipeUsed % 2][1]);
+      dup2(pipes[pipeUsed % 2][0], STDIN_FILENO);
+      pipeUsed++;
+      close(pipes[pipeUsed % 2][0]);
+      close(pipes[pipeUsed % 2][1]);
+    }
 
     child_run_command(holder.cmd);
     //destroy the job
@@ -407,16 +419,25 @@ void create_process(CommandHolder holder) {
   }
   else{
     //check if pipe out
-    /*if(p_out){
+    if(p_out){
       //pipe[][1]
-      close();
+      close(pipes[pipeUsed % 2][0]);
+      dup2(pipes[pipeUsed % 2][1], STDOUT_FILENO);
+      pipeUsed++;
+      close(pipes[pipeUsed % 2][0]);
+      close(pipes[pipeUsed % 2][1]);
     }
     if(p_in){
       //pipe[][0]
-      close();*/
+      dup2(pipes[pipeUsed % 2][0], STDIN_FILENO);
+      close(pipes[pipeUsed % 2][1]);
+      pipeUsed++;
+      close(pipes[pipeUsed % 2][0]);
+      close(pipes[pipeUsed % 2][1]);
       //push the process to the front of the q
       parent_run_command(holder.cmd);
     }
+}
 }
 // Run a list of commands
 void run_script(CommandHolder* holders) {
@@ -433,7 +454,7 @@ void run_script(CommandHolder* holders) {
 
   CommandType type;
   //create a new job to hold the current job, call the constructor
-  job curr_job = _new_job();
+  job_t curr_job = _new_job();
 
   // Run all commands in the `holder` array
   for (int i = 0; (type = get_command_holder_type(holders[i])) != EOC; ++i)
@@ -443,12 +464,12 @@ void run_script(CommandHolder* holders) {
     // Not a background Job
     // TODO: Wait for all processes under the job to complete
     //need another wait (waitpid) to wait the perfect amount of time
-    while (!is_empty_PIDDeque(&curr_job.process_list)){
+    while (!is_empty_piddeque(&curr_job.process_list)){
     int status;
     //-1 will wait untill the child process ends correctly
-    if(waitpid(peek_back_PIDDeque(&curr_job.process_list), &status, 0 != -1)){
+    if(waitpid(peek_back_piddeque(&curr_job.process_list), &status, 0 != -1)){
       //pop changes the value of the last element in the q while peek does not
-      pop_back_PIDDeque(&curr_job.process_list);
+      pop_back_piddeque(&curr_job.process_list);
       }
     }
   }
@@ -467,6 +488,6 @@ void run_script(CommandHolder* holders) {
 
     // TODO: Once jobs are implemented, uncomment and fill the following line
     //print the first element in the pid q (which what peek returns)
-    print_job_bg_start(curr_job.job_id,peek_front_PIDDeque(&curr_job.process_list), curr_job.cmd);
+    print_job_bg_start(curr_job.job_id,peek_front_piddeque(&curr_job.process_list), curr_job.cmd);
   }
 }
