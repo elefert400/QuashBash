@@ -6,7 +6,7 @@
  *
  * @note As you add things to this file you may want to change the method signature
  */
- //destructor, background status, passing current process into create process
+ //background status, passing current process into create process
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
