@@ -283,7 +283,15 @@ void run_kill(KillCommand cmd) {
 
   // TODO: Kill all processes associated with a background job
   //IMPLEMENT_ME();
-  kill(job_id, signal);
+  int numJobs = length_BG_job(&bg_jobs);
+  for(int k = 0; k < numJobs; k++)
+  {
+    job_t tempJob = pop_front_BG_job(&bg_jobs);
+
+    print_job(tempJob.job_id, peek_front_piddeque(&tempJob.process_list), tempJob.cmd);
+
+    push_back_BG_job(&bg_jobs, tempJob);
+  }
 }
 
 
@@ -432,14 +440,18 @@ void create_process(CommandHolder holder, job_t* curr_job) {
                                                // is true
 
   pid_t pid;
+  if(p_out)
+  {
+    pipe(pipes[pipeUsed % 2]);
+  }
   // TODO: Setup pipes, redirects, and new process
   pid = fork();
   if (pid == 0){
     //redirect to the same place
     if(r_in){
-      int in = open(holder.redirect_in, O_RDONLY);
+      FILE* in = fopen(holder.redirect_in, "r");
       dup2(in, STDIN_FILENO);
-      close(in);
+      fclose(in);
     }
     //redirect to a file
     if (r_out){
@@ -462,17 +474,11 @@ void create_process(CommandHolder holder, job_t* curr_job) {
       //pipe[][0]
       close(pipes[pipeUsed % 2][1]);
       dup2(pipes[pipeUsed % 2][0], STDIN_FILENO);
-      pipeUsed++;
-      close(pipes[pipeUsed % 2][0]);
-      close(pipes[pipeUsed % 2][1]);
     }
 
     if(p_out){
       close(pipes[pipeUsed % 2][0]);
       dup2(pipes[pipeUsed % 2][1], STDOUT_FILENO);
-      pipeUsed++;
-      close(pipes[pipeUsed % 2][0]);
-      close(pipes[pipeUsed % 2][1]);
     }
 
 
@@ -481,16 +487,15 @@ void create_process(CommandHolder holder, job_t* curr_job) {
     exit (EXIT_SUCCESS);
   }
   else{
-      //pipe[][1]
-      /*close(pipes[pipeUsed % 2][0]);
-      dup2(pipes[pipeUsed % 2][1], STDOUT_FILENO);
+      if(p_out)
+      {
+        close(pipes[pipeUsed % 2][0]);
+      }
       pipeUsed++;
-      close(pipes[pipeUsed % 2][0]);
-      close(pipes[pipeUsed % 2][1]);*/
-      push_back_piddeque(&curr_job->process_list, pid);
+      //push_back_piddeque(&curr_job->process_list, pid);
       parent_run_command(holder.cmd);
-
     }
+
   /*  if(p_in){
       //pipe[][0]
       dup2(pipes[pipeUsed % 2][0], STDIN_FILENO);
