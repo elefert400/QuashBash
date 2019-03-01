@@ -18,6 +18,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+
 #include "execute.h"
 #include "quash.h"
 #include "deque.h"
@@ -35,7 +36,6 @@
 //sets up deque struct for processes
 IMPLEMENT_DEQUE_STRUCT(piddeque, pid_t);
 //sets up deque functions
-PROTOTYPE_DEQUE(piddeque, pid_t);
 IMPLEMENT_DEQUE(piddeque, pid_t);
 //sets up job deque
 typedef struct job_t
@@ -46,7 +46,6 @@ typedef struct job_t
 }job_t;
 
 IMPLEMENT_DEQUE_STRUCT(BG_job, job_t);
-PROTOTYPE_DEQUE(BG_job, job_t);
 //sets up functions for deque
 IMPLEMENT_DEQUE(BG_job, job_t);
 
@@ -61,7 +60,6 @@ static job_t _new_job()
   };
 }
 
-BG_job bg_jobs;
 
 //needs work
 //implement destructor, free process command and destroy process deque
@@ -72,6 +70,7 @@ static void _destroy_job(job_t b)
   destroy_piddeque(&b.process_list);
 }
 
+BG_job bg_jobs;
 
 //delcaring pipes
 int pipes[2][2];
@@ -119,7 +118,9 @@ void check_jobs_bg_status() {
   IMPLEMENT_ME();
 
   // first check if there is a background job:
-  if (is_empty_BG_job(&bg_jobs)) {return;};
+  if (is_empty_BG_job(&bg_jobs)) {
+    return;
+  };
 
   // to iterate through the job queue we need to get its length:
   int length = length_BG_job(&bg_jobs);
@@ -155,15 +156,15 @@ void check_jobs_bg_status() {
         push_back_piddeque(&curr_job.process_list, curr_process);
       }
       // I am not sure if we need to do anything in these cases.
-      else if(next_process > 0){}
-      else if(next_process <= -1){}
+      else if(next_process == -1){}
+      else if(next_process == curr_process){}
+    }
 
       if(is_empty_piddeque(&curr_job.process_list)){
         print_job_bg_complete(curr_job.job_id, first_process, curr_job.cmd);
         _destroy_job(curr_job);
       }
       else push_back_BG_job(&bg_jobs,curr_job);
-    }
 
   }
 
@@ -303,7 +304,7 @@ void run_pwd() {
 void run_jobs() {
   // TODO: Print background jobs
   IMPLEMENT_ME();
-  if (is_empty_BG_job(&bg_jobs)) return;
+  //if (is_empty_BG_job(&bg_jobs)) return;
   // if there is a background job:
   int length = length_BG_job(&bg_jobs);
   for(int i=0; i<length;i++){
@@ -504,6 +505,9 @@ void create_process(CommandHolder holder, job_t* curr_job) {
 void run_script(CommandHolder* holders) {
   if (holders == NULL)
     return;
+
+  bg_jobs = new_destructable_BG_job(1, _destroy_job);
+
 
   check_jobs_bg_status();
 
