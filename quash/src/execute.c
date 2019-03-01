@@ -72,8 +72,6 @@ static void _destroy_job(job_t b)
   destroy_piddeque(&b.process_list);
 }
 
-//declares job deque, needs to initalize in the start of run_script
-piddeque queue;
 
 //delcaring pipes
 int pipes[2][2];
@@ -121,7 +119,7 @@ void check_jobs_bg_status() {
   IMPLEMENT_ME();
 
   // first check if there is a background job:
-  if (is_empty_BG_job(&bg_jobs)) return;
+  if (is_empty_BG_job(&bg_jobs)) {return;};
 
   // to iterate through the job queue we need to get its length:
   int length = length_BG_job(&bg_jobs);
@@ -158,13 +156,13 @@ void check_jobs_bg_status() {
       }
       // I am not sure if we need to do anything in these cases.
       else if(next_process > 0){}
-      else if(next_process < -1){}
+      else if(next_process <= -1){}
 
       if(is_empty_piddeque(&curr_job.process_list)){
         print_job_bg_complete(curr_job.job_id, first_process, curr_job.cmd);
         _destroy_job(curr_job);
       }
-      else push_back_piddeque(&bg_jobs,&curr_job);
+      else push_back_BG_job(&bg_jobs,curr_job);
     }
 
   }
@@ -306,11 +304,14 @@ void run_jobs() {
   // TODO: Print background jobs
   IMPLEMENT_ME();
   if (is_empty_BG_job(&bg_jobs)) return;
-
+  // if there is a background job:
   int length = length_BG_job(&bg_jobs);
   for(int i=0; i<length;i++){
+    // pget the current job values
     job_t curr_job = pop_front_BG_job(&bg_jobs);
+    // printing the job
     print_job(curr_job.job_id, peek_front_piddeque(&curr_job.process_list), curr_job.cmd);
+    // return it back to the que
     push_back_BG_job(&bg_jobs, curr_job);
   }
 
@@ -420,7 +421,7 @@ void parent_run_command(Command cmd) {
  *
  * @sa Command CommandHolder
  */
-void create_process(CommandHolder holder) {
+void create_process(CommandHolder holder, job_t* curr_job) {
   // Read the flags field from the parser
   bool p_in  = holder.flags & PIPE_IN;
   bool p_out = holder.flags & PIPE_OUT;
@@ -465,21 +466,31 @@ void create_process(CommandHolder holder) {
       close(pipes[pipeUsed % 2][1]);
     }
 
-    child_run_command(holder.cmd);
-    //destroy the job
-    exit (EXIT_SUCCESS);
-  }
-  else{
-    //check if pipe out
     if(p_out){
-      //pipe[][1]
       close(pipes[pipeUsed % 2][0]);
       dup2(pipes[pipeUsed % 2][1], STDOUT_FILENO);
       pipeUsed++;
       close(pipes[pipeUsed % 2][0]);
       close(pipes[pipeUsed % 2][1]);
     }
-    if(p_in){
+
+
+    child_run_command(holder.cmd);
+    //destroy the job
+    exit (EXIT_SUCCESS);
+  }
+  else{
+      //pipe[][1]
+      /*close(pipes[pipeUsed % 2][0]);
+      dup2(pipes[pipeUsed % 2][1], STDOUT_FILENO);
+      pipeUsed++;
+      close(pipes[pipeUsed % 2][0]);
+      close(pipes[pipeUsed % 2][1]);*/
+      push_back_piddeque(&curr_job->process_list, pid);
+      parent_run_command(holder.cmd);
+
+    }
+  /*  if(p_in){
       //pipe[][0]
       dup2(pipes[pipeUsed % 2][0], STDIN_FILENO);
       close(pipes[pipeUsed % 2][1]);
@@ -487,9 +498,7 @@ void create_process(CommandHolder holder) {
       close(pipes[pipeUsed % 2][0]);
       close(pipes[pipeUsed % 2][1]);
       //push the process to the front of the q
-      parent_run_command(holder.cmd);
-    }
-}
+    }*/
 }
 // Run a list of commands
 void run_script(CommandHolder* holders) {
@@ -506,37 +515,38 @@ void run_script(CommandHolder* holders) {
 
   CommandType type;
   //create a new job to hold the current job, call the constructor
+  //job_t curr_job = pop_front_BG_job(&bg_jobs);
   job_t curr_job = _new_job();
 
   // Run all commands in the `holder` array
   for (int i = 0; (type = get_command_holder_type(holders[i])) != EOC; ++i)
-    create_process(holders[i]);
+    create_process(holders[i], &curr_job);
 
   if (!(holders[0].flags & BACKGROUND)) {
     // Not a background Job
     // TODO: Wait for all processes under the job to complete
     //need another wait (waitpid) to wait the perfect amount of time
     while (!is_empty_piddeque(&curr_job.process_list)){
-    int status;
-    //-1 will wait untill the child process ends correctly
-    if(waitpid(peek_back_piddeque(&curr_job.process_list), &status, 0 != -1)){
-      //pop changes the value of the last element in the q while peek does not
-      pop_back_piddeque(&curr_job.process_list);
-      }
+    pid_t curr_process = pop_back_piddeque(&curr_job.process_list);
+    int status = 0;
+    waitpid(curr_process, &status, 0);
     }
+    free(curr_job.cmd);
+    destroy_piddeque(&curr_job.process_list);
   }
   else {
     // A background job.
+
+    if(is_empty_BG_job(&bg_jobs)) curr_job.job_id = 1;
+    else curr_job.job_id = peek_back_BG_job(&bg_jobs).job_id + 1;
+
     curr_job.cmd = get_command_string();
-    //need a global job_id to keep the total number correct.
-    //curr_job.job_id = job_id++;
-    //add the background job to the end of the q
-    push_back_BG_job(&bg_jobs, curr_job);
 
     // TODO: Push the new job to the job queue
     //figure out new job ID and push it to the back of the job queue and print that the background job has started
+    //add the background job to the end of the q
+    push_back_BG_job(&bg_jobs, curr_job);
 
-    IMPLEMENT_ME();
 
     // TODO: Once jobs are implemented, uncomment and fill the following line
     //print the first element in the pid q (which what peek returns)
