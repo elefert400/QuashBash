@@ -302,7 +302,7 @@ void run_pwd() {
   //used get current directory and free it
   bool should_free = false;
   char* dbuff = get_current_directory(&should_free);
-  printf("\nDirectory:%s \n", dbuff);
+  printf("%s\n", dbuff);
   if (should_free) free(dbuff);
   // Flush the buffer before returning
   fflush(stdout);
