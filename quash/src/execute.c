@@ -37,13 +37,19 @@ IMPLEMENT_DEQUE_STRUCT(piddeque, pid_t);
 //sets up deque functions
 PROTOTYPE_DEQUE(piddeque, pid_t);
 IMPLEMENT_DEQUE(piddeque, pid_t);
-
+//sets up job deque
 typedef struct job_t
 {
   piddeque process_list;
   int job_id;
   char* cmd;
 }job_t;
+
+IMPLEMENT_DEQUE_STRUCT(BG_job, job_t);
+PROTOTYPE_DEQUE(BG_job, job_t);
+//sets up functions for deque
+IMPLEMENT_DEQUE(BG_job, job_t);
+
 
 //jobs contructor
 static job_t _new_job()
@@ -55,30 +61,19 @@ static job_t _new_job()
   };
 }
 
+BG_job bg_jobs;
+
 //needs work
 //implement destructor, free process command and destroy process deque
 static void _destroy_job(job_t b)
 {
   //getting the size and using it and the destructor to deallocate the process dequeue
-  if(b.cmd == NULL)
-  {
-    //we dont need to free anything if it is null
-  }
-  else
-  {
-    free(b.cmd);
-  }
+  if(b.cmd != NULL) free(b.cmd);
   destroy_piddeque(&b.process_list);
 }
-//sets up job deque
-IMPLEMENT_DEQUE_STRUCT(BG_job, job_t);
-PROTOTYPE_DEQUE(BG_job, job_t);
-//sets up functions for deque
-IMPLEMENT_DEQUE(BG_job, job_t);
 
 //declares job deque, needs to initalize in the start of run_script
 piddeque queue;
-BG_job bg_jobs;
 
 //delcaring pipes
 int pipes[2][2];
@@ -94,6 +89,7 @@ char* get_current_directory(bool* should_free) {
   // TODO: Get the current working directory. This will fix the prompt path.
   // HINT: This should be pretty simple
   //IMPLEMENT_ME();
+  *should_free = true;
   char* dbuff = getcwd(NULL, 0);
   // Change this to true if necessary
   /*if (should_free==true){
@@ -223,9 +219,8 @@ void run_cd(CDCommand cmd) {
   // TODO: Update the PWD environment variable to be the new current working
   // directory and optionally update OLD_PWD environment variable to be the old
   // working directory.
-  //const char* env_var = "PWD";
-  //lookup_env(env_var);
-  //const char* val = cmd.val;
+  setenv("OLD_PWD", lookup_env("PWD"), 1);
+  setenv("PWD", dir, 1);
   //IMPLEMENT_ME();
 }
 
@@ -249,10 +244,10 @@ void run_pwd() {
   // TODO: Print the current working directory
   //IMPLEMENT_ME();
   //used get current directory and free it
-  bool* should_free = false;
-  char* dbuff = get_current_directory(should_free);
+  bool should_free = false;
+  char* dbuff = get_current_directory(&should_free);
   printf("\nDirectory:%s \n", dbuff);
-  free(dbuff);
+  if (should_free) free(dbuff);
   // Flush the buffer before returning
   fflush(stdout);
 }
@@ -261,6 +256,14 @@ void run_pwd() {
 void run_jobs() {
   // TODO: Print background jobs
   IMPLEMENT_ME();
+  if (is_empty_BG_job(&bg_jobs)) return;
+
+  int length = length_BG_job(&bg_jobs);
+  for(int i=0; i<length;i++){
+    job_t curr_job = pop_front_BG_job(&bg_jobs);
+    print_job(curr_job.job_id, peek_front_piddeque(&curr_job.process_list), curr_job.cmd);
+    push_back_BG_job(&bg_jobs, curr_job);
+  }
 
   // Flush the buffer before returning
   fflush(stdout);
