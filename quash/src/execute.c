@@ -287,6 +287,14 @@ void run_kill(KillCommand cmd) {
   for(int k = 0; k < numJobs; k++)
   {
     job_t tempJob = pop_front_BG_job(&bg_jobs);
+    if(job_id == tempJob.job_id){
+      int numPro = length_piddeque(&tempJob.process_list);
+      for(int j =0; j< numPro; j++){
+        pid_t curr_process = pop_front_piddeque(&tempJob.process_list);
+        kill(curr_process, signal);
+        push_back_piddeque(&tempJob.process_list, curr_process);
+      }
+    }
 
     print_job(tempJob.job_id, peek_front_piddeque(&tempJob.process_list), tempJob.cmd);
 

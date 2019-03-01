@@ -1,50 +1,85 @@
-==13589== Memcheck, a memory error detector
-==13589== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==13589== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-==13589== Command: /mnt/c/Users/ayaha/Desktop/project/QuashBash/quash/quash
-==13589== 
-==13589== error calling PR_SET_PTRACER, vgdb might block
-==13636== Conditional jump or move depends on uninitialised value(s)
-==13636==    at 0x10C46D: run_echo (execute.c:228)
-==13636==    by 0x10C84C: child_run_command (execute.c:355)
-==13636==    by 0x10CB5D: create_process (execute.c:485)
-==13636==    by 0x10CD36: run_script (execute.c:532)
-==13636==    by 0x109A1E: main (quash.c:132)
-==13636==  Uninitialised value was created by a heap allocation
-==13636==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==13636==    by 0x10E09E: __initialize_memory_pool (memory_pool.c:44)
-==13636==    by 0x10E248: initialize_memory_pool (memory_pool.c:89)
-==13636==    by 0x1099FB: main (quash.c:128)
-==13636== 
-==13589== 
-==13589== HEAP SUMMARY:
-==13589==     in use at exit: 56 bytes in 1 blocks
-==13589==   total heap usage: 13 allocs, 12 frees, 23,269 bytes allocated
-==13589== 
-==13589== LEAK SUMMARY:
-==13589==    definitely lost: 0 bytes in 0 blocks
-==13589==    indirectly lost: 0 bytes in 0 blocks
-==13589==      possibly lost: 0 bytes in 0 blocks
-==13589==    still reachable: 56 bytes in 1 blocks
-==13589==         suppressed: 0 bytes in 0 blocks
-==13589== Reachable blocks (those to which a pointer was found) are not shown.
-==13589== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==13589== 
-==13589== For counts of detected and suppressed errors, rerun with: -v
-==13589== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
-==13636== 
-==13636== HEAP SUMMARY:
-==13636==     in use at exit: 83 bytes in 3 blocks
-==13636==   total heap usage: 14 allocs, 11 frees, 27,365 bytes allocated
-==13636== 
-==13636== LEAK SUMMARY:
-==13636==    definitely lost: 0 bytes in 0 blocks
-==13636==    indirectly lost: 0 bytes in 0 blocks
-==13636==      possibly lost: 0 bytes in 0 blocks
-==13636==    still reachable: 83 bytes in 3 blocks
-==13636==         suppressed: 0 bytes in 0 blocks
-==13636== Reachable blocks (those to which a pointer was found) are not shown.
-==13636== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==13636== 
-==13636== For counts of detected and suppressed errors, rerun with: -v
-==13636== ERROR SUMMARY: 6 errors from 1 contexts (suppressed: 0 from 0)
+==14571== Memcheck, a memory error detector
+==14571== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==14571== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==14571== Command: /mnt/c/Users/ayaha/Desktop/project/QuashBash/quash/quash
+==14571== 
+==14571== error calling PR_SET_PTRACER, vgdb might block
+==14571== Invalid free() / delete / delete[] / realloc()
+==14571==    at 0x4C30D3B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14571==    by 0x10CE2F: run_script (execute.c:545)
+==14571==    by 0x109A1E: main (quash.c:132)
+==14571==  Address 0x5232e40 is 0 bytes inside a block of size 23 free'd
+==14571==    at 0x4C30D3B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14571==    by 0x10C145: _destroy_job (execute.c:69)
+==14571==    by 0x10CD5E: run_script (execute.c:533)
+==14571==    by 0x109A1E: main (quash.c:132)
+==14571==  Block was alloc'd at
+==14571==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14571==    by 0x4ED99B9: strdup (strdup.c:42)
+==14571==    by 0x109930: get_command_string (quash.c:88)
+==14571==    by 0x10C0D1: _new_job (execute.c:59)
+==14571==    by 0x10CCDF: run_script (execute.c:528)
+==14571==    by 0x109A1E: main (quash.c:132)
+==14571== 
+==14571== Invalid free() / delete / delete[] / realloc()
+==14571==    at 0x4C30D3B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14571==    by 0x109F10: destroy_piddeque (execute.c:39)
+==14571==    by 0x10CE3E: run_script (execute.c:546)
+==14571==    by 0x109A1E: main (quash.c:132)
+==14571==  Address 0x5232df0 is 0 bytes inside a block of size 4 free'd
+==14571==    at 0x4C30D3B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14571==    by 0x109F10: destroy_piddeque (execute.c:39)
+==14571==    by 0x10C14E: _destroy_job (execute.c:70)
+==14571==    by 0x10CD5E: run_script (execute.c:533)
+==14571==    by 0x109A1E: main (quash.c:132)
+==14571==  Block was alloc'd at
+==14571==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14571==    by 0x109D90: new_piddeque (execute.c:39)
+==14571==    by 0x10C0C7: _new_job (execute.c:57)
+==14571==    by 0x10CCDF: run_script (execute.c:528)
+==14571==    by 0x109A1E: main (quash.c:132)
+==14571== 
+==14623== Conditional jump or move depends on uninitialised value(s)
+==14623==    at 0x10C46D: run_echo (execute.c:228)
+==14623==    by 0x10C84C: child_run_command (execute.c:355)
+==14623==    by 0x10CB5D: create_process (execute.c:485)
+==14623==    by 0x10CD36: run_script (execute.c:532)
+==14623==    by 0x109A1E: main (quash.c:132)
+==14623==  Uninitialised value was created by a heap allocation
+==14623==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14623==    by 0x10E0C6: __initialize_memory_pool (memory_pool.c:44)
+==14623==    by 0x10E270: initialize_memory_pool (memory_pool.c:89)
+==14623==    by 0x1099FB: main (quash.c:128)
+==14623== 
+==14571== 
+==14571== HEAP SUMMARY:
+==14571==     in use at exit: 56 bytes in 1 blocks
+==14571==   total heap usage: 13 allocs, 14 frees, 23,269 bytes allocated
+==14571== 
+==14571== LEAK SUMMARY:
+==14571==    definitely lost: 0 bytes in 0 blocks
+==14571==    indirectly lost: 0 bytes in 0 blocks
+==14571==      possibly lost: 0 bytes in 0 blocks
+==14571==    still reachable: 56 bytes in 1 blocks
+==14571==         suppressed: 0 bytes in 0 blocks
+==14571== Reachable blocks (those to which a pointer was found) are not shown.
+==14571== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==14571== 
+==14571== For counts of detected and suppressed errors, rerun with: -v
+==14571== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)
+==14623== 
+==14623== HEAP SUMMARY:
+==14623==     in use at exit: 83 bytes in 3 blocks
+==14623==   total heap usage: 14 allocs, 11 frees, 27,365 bytes allocated
+==14623== 
+==14623== LEAK SUMMARY:
+==14623==    definitely lost: 0 bytes in 0 blocks
+==14623==    indirectly lost: 0 bytes in 0 blocks
+==14623==      possibly lost: 0 bytes in 0 blocks
+==14623==    still reachable: 83 bytes in 3 blocks
+==14623==         suppressed: 0 bytes in 0 blocks
+==14623== Reachable blocks (those to which a pointer was found) are not shown.
+==14623== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==14623== 
+==14623== For counts of detected and suppressed errors, rerun with: -v
+==14623== ERROR SUMMARY: 6 errors from 1 contexts (suppressed: 0 from 0)
