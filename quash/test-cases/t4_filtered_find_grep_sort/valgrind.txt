@@ -1,0 +1,30 @@
+==14046== Memcheck, a memory error detector
+==14046== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==14046== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==14046== Command: /mnt/c/Users/ayaha/Desktop/project/QuashBash/quash/quash
+==14046== 
+==14046== error calling PR_SET_PTRACER, vgdb might block
+==14086== error calling PR_SET_PTRACER, vgdb might block
+==14046== 
+==14046== HEAP SUMMARY:
+==14046==     in use at exit: 168 bytes in 3 blocks
+==14046==   total heap usage: 35 allocs, 32 frees, 33,754 bytes allocated
+==14046== 
+==14046== 112 bytes in 2 blocks are definitely lost in loss record 2 of 2
+==14046==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14046==    by 0x10AD75: new_BG_job (execute.c:50)
+==14046==    by 0x10AE2B: new_destructable_BG_job (execute.c:50)
+==14046==    by 0x10CC0F: run_script (execute.c:514)
+==14046==    by 0x109A1E: main (quash.c:132)
+==14046== 
+==14046== LEAK SUMMARY:
+==14046==    definitely lost: 112 bytes in 2 blocks
+==14046==    indirectly lost: 0 bytes in 0 blocks
+==14046==      possibly lost: 0 bytes in 0 blocks
+==14046==    still reachable: 56 bytes in 1 blocks
+==14046==         suppressed: 0 bytes in 0 blocks
+==14046== Reachable blocks (those to which a pointer was found) are not shown.
+==14046== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==14046== 
+==14046== For counts of detected and suppressed errors, rerun with: -v
+==14046== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)

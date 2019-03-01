@@ -450,7 +450,7 @@ void create_process(CommandHolder holder, job_t* curr_job) {
     //redirect to the same place
     if(r_in){
       FILE* in = fopen(holder.redirect_in, "r");
-      dup2(in, STDIN_FILENO);
+      dup2(fileno(in), STDIN_FILENO);
       fclose(in);
     }
     //redirect to a file
@@ -528,8 +528,10 @@ void run_script(CommandHolder* holders) {
   job_t curr_job = _new_job();
 
   // Run all commands in the `holder` array
-  for (int i = 0; (type = get_command_holder_type(holders[i])) != EOC; ++i)
+  for (int i = 0; (type = get_command_holder_type(holders[i])) != EOC; ++i){
     create_process(holders[i], &curr_job);
+    _destroy_job(curr_job);
+  }
 
   if (!(holders[0].flags & BACKGROUND)) {
     // Not a background Job
