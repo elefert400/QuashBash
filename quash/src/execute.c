@@ -120,6 +120,55 @@ void check_jobs_bg_status() {
   // processes belonging to a job have completed.
   IMPLEMENT_ME();
 
+  // first check if there is a background job:
+  if (is_empty_BG_job(&bg_jobs)) return;
+
+  // to iterate through the job queue we need to get its length:
+  int length = length_BG_job(&bg_jobs);
+  // for each job, create a current job to be the running job,
+  // first process to be the running process in the bg job
+  // git the length of the process_list
+  for(int i=0; i<length; i++){
+    // pop will return the first job in the background job que and remove it from the front.
+    job_t curr_job = pop_front_BG_job(&bg_jobs);
+    // peek will return the front process without removing it, we need to keep it in
+    // until we check if it is complete or running.
+    pid_t first_process = peek_front_piddeque(&curr_job.process_list);
+    // get process list length.
+    int process_list_length = length_piddeque(&curr_job.process_list);
+
+    // for each process, we need to check if it is complete or still running:
+    for(int j=0; j<process_list_length; j++){
+      pid_t curr_process = pop_front_piddeque(&curr_job.process_list);
+      int status;
+      /*
+      The waitpid() system call suspends execution of the calling process until a child specified by pid argument has changed state. By default, waitpid() waits only for terminated children, but this behavior is modifiable via the options argument, as described below.
+      The value of pid can be:
+      < -1
+      meaning wait for any child process whose process group ID is equal to the absolute value of pid.
+      -1
+      meaning wait for any child process.
+      0
+      meaning wait for any child process whose process group ID is equal to that of the calling process.
+      > 0*/
+      pid_t next_process = waitpid(cuur_process, &status, WNOHANG);
+
+      if(next_process == 0) {
+        push_back_piddeque(&curr_job.process_list, curr_process);
+      }
+      // I am not sure if we need to do anything in these cases.
+      else if(next_process > 0){}
+      else if(next_process < -1){}
+
+      if(is_empty_piddeque(&curr_job.process_list)){
+        print_job_bg_complete(curr_job.job_id, first_process, curr_job.cmd);
+        _destroy_job(curr_job);
+      }
+      else push_back_piddeque(&bg_jobs, curr_job);
+    }
+
+  }
+
   // TODO: Once jobs are implemented, uncomment and fill the following line
   // print_job_bg_complete(job_id, pid, cmd);
 }
