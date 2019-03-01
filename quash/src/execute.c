@@ -151,7 +151,7 @@ void check_jobs_bg_status() {
       0
       meaning wait for any child process whose process group ID is equal to that of the calling process.
       > 0*/
-      pid_t next_process = waitpid(cuur_process, &status, WNOHANG);
+      pid_t next_process = waitpid(curr_process, &status, WNOHANG);
 
       if(next_process == 0) {
         push_back_piddeque(&curr_job.process_list, curr_process);
@@ -164,7 +164,7 @@ void check_jobs_bg_status() {
         print_job_bg_complete(curr_job.job_id, first_process, curr_job.cmd);
         _destroy_job(curr_job);
       }
-      else push_back_piddeque(&bg_jobs, curr_job);
+      else push_back_piddeque(&bg_jobs,&curr_job);
     }
 
   }
