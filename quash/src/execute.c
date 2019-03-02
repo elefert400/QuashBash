@@ -228,11 +228,13 @@ void run_echo(EchoCommand cmd) {
   // TODO: Implement echo
   //IMPLEMENT_ME();
   //int size =
-  for(int i = 0; i < sizeof(str);i++){
-    if (str[i] != NULL)
-    printf("%s ", str[i]);
+  int k = 0;
+  while(str[k] != NULL){
+    printf("%s ", str[k]);
+    k++;
   }
   printf("\n");
+  //free(str);
   // Flush the buffer before returning
   fflush(stdout);
 }
