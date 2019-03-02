@@ -560,8 +560,10 @@ void run_script(CommandHolder* holders) {
       int status = 0;
       waitpid(curr_process, &status, 0);
     }
-    free(curr_job.cmd);
-    destroy_piddeque(&curr_job.process_list);
+    if(is_empty_piddeque(&curr_job.process_list))
+    {
+      _destroy_job(curr_job);
+    }
   }
   else {
     // A background job.
