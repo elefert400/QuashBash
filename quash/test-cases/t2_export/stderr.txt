@@ -1,179 +1,109 @@
-==14634== Memcheck, a memory error detector
-==14634== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==14634== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-==14634== Command: /mnt/c/Users/ayaha/Desktop/project/QuashBash/quash/quash
-==14634== 
-==14634== error calling PR_SET_PTRACER, vgdb might block
+==22811== Memcheck, a memory error detector
+==22811== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==22811== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==22811== Command: /mnt/c/Users/ayaha/Desktop/project/QuashBash/quash/quash
+==22811== 
+==22811== error calling PR_SET_PTRACER, vgdb might block
 IMPLEMENT ME: src/execute.c(line 118): check_jobs_bg_status()
-==14634== Invalid free() / delete / delete[] / realloc()
-==14634==    at 0x4C30D3B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14634==    by 0x10CE2F: run_script (execute.c:545)
-==14634==    by 0x109A1E: main (quash.c:132)
-==14634==  Address 0x5232df0 is 0 bytes inside a block of size 5 free'd
-==14634==    at 0x4C30D3B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14634==    by 0x10C145: _destroy_job (execute.c:69)
-==14634==    by 0x10CD5E: run_script (execute.c:533)
-==14634==    by 0x109A1E: main (quash.c:132)
-==14634==  Block was alloc'd at
-==14634==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14634==    by 0x4ED99B9: strdup (strdup.c:42)
-==14634==    by 0x109930: get_command_string (quash.c:88)
-==14634==    by 0x10C0D1: _new_job (execute.c:59)
-==14634==    by 0x10CCDF: run_script (execute.c:528)
-==14634==    by 0x109A1E: main (quash.c:132)
-==14634== 
-==14634== Invalid free() / delete / delete[] / realloc()
-==14634==    at 0x4C30D3B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14634==    by 0x109F10: destroy_piddeque (execute.c:39)
-==14634==    by 0x10CE3E: run_script (execute.c:546)
-==14634==    by 0x109A1E: main (quash.c:132)
-==14634==  Address 0x5232da0 is 0 bytes inside a block of size 4 free'd
-==14634==    at 0x4C30D3B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14634==    by 0x109F10: destroy_piddeque (execute.c:39)
-==14634==    by 0x10C14E: _destroy_job (execute.c:70)
-==14634==    by 0x10CD5E: run_script (execute.c:533)
-==14634==    by 0x109A1E: main (quash.c:132)
-==14634==  Block was alloc'd at
-==14634==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14634==    by 0x109D90: new_piddeque (execute.c:39)
-==14634==    by 0x10C0C7: _new_job (execute.c:57)
-==14634==    by 0x10CCDF: run_script (execute.c:528)
-==14634==    by 0x109A1E: main (quash.c:132)
-==14634== 
+==22861== 
+==22861== HEAP SUMMARY:
+==22861==     in use at exit: 65 bytes in 3 blocks
+==22861==   total heap usage: 14 allocs, 11 frees, 27,835 bytes allocated
+==22861== 
+==22861== LEAK SUMMARY:
+==22861==    definitely lost: 0 bytes in 0 blocks
+==22861==    indirectly lost: 0 bytes in 0 blocks
+==22861==      possibly lost: 0 bytes in 0 blocks
+==22861==    still reachable: 65 bytes in 3 blocks
+==22861==         suppressed: 0 bytes in 0 blocks
+==22861== Reachable blocks (those to which a pointer was found) are not shown.
+==22861== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==22861== 
+==22861== For counts of detected and suppressed errors, rerun with: -v
+==22861== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 IMPLEMENT ME: src/execute.c(line 118): check_jobs_bg_status()
-==14697== 
-==14697== HEAP SUMMARY:
-==14697==     in use at exit: 65 bytes in 3 blocks
-==14697==   total heap usage: 15 allocs, 12 frees, 31,507 bytes allocated
-==14697== 
-==14697== LEAK SUMMARY:
-==14697==    definitely lost: 0 bytes in 0 blocks
-==14697==    indirectly lost: 0 bytes in 0 blocks
-==14697==      possibly lost: 0 bytes in 0 blocks
-==14697==    still reachable: 65 bytes in 3 blocks
-==14697==         suppressed: 0 bytes in 0 blocks
-==14697== Reachable blocks (those to which a pointer was found) are not shown.
-==14697== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==14697== 
-==14697== For counts of detected and suppressed errors, rerun with: -v
-==14697== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==22873== 
+==22873== HEAP SUMMARY:
+==22873==     in use at exit: 89 bytes in 3 blocks
+==22873==   total heap usage: 23 allocs, 20 frees, 27,156 bytes allocated
+==22873== 
+==22873== LEAK SUMMARY:
+==22873==    definitely lost: 0 bytes in 0 blocks
+==22873==    indirectly lost: 0 bytes in 0 blocks
+==22873==      possibly lost: 0 bytes in 0 blocks
+==22873==    still reachable: 89 bytes in 3 blocks
+==22873==         suppressed: 0 bytes in 0 blocks
+==22873== Reachable blocks (those to which a pointer was found) are not shown.
+==22873== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==22873== 
+==22873== For counts of detected and suppressed errors, rerun with: -v
+==22873== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 IMPLEMENT ME: src/execute.c(line 118): check_jobs_bg_status()
-==14710== 
-==14710== HEAP SUMMARY:
-==14710==     in use at exit: 145 bytes in 4 blocks
-==14710==   total heap usage: 23 allocs, 21 frees, 27,212 bytes allocated
-==14710== 
-==14710== 56 bytes in 1 blocks are definitely lost in loss record 4 of 4
-==14710==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14710==    by 0x10AD75: new_BG_job (execute.c:50)
-==14710==    by 0x10AE2B: new_destructable_BG_job (execute.c:50)
-==14710==    by 0x10CC0F: run_script (execute.c:514)
-==14710==    by 0x109A1E: main (quash.c:132)
-==14710== 
-==14710== LEAK SUMMARY:
-==14710==    definitely lost: 56 bytes in 1 blocks
-==14710==    indirectly lost: 0 bytes in 0 blocks
-==14710==      possibly lost: 0 bytes in 0 blocks
-==14710==    still reachable: 89 bytes in 3 blocks
-==14710==         suppressed: 0 bytes in 0 blocks
-==14710== Reachable blocks (those to which a pointer was found) are not shown.
-==14710== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==14710== 
-==14710== For counts of detected and suppressed errors, rerun with: -v
-==14710== ERROR SUMMARY: 3 errors from 3 contexts (suppressed: 0 from 0)
+==22879== error calling PR_SET_PTRACER, vgdb might block
+==22879== 
+==22879== HEAP SUMMARY:
+==22879==     in use at exit: 65 bytes in 3 blocks
+==22879==   total heap usage: 37 allocs, 34 frees, 35,698 bytes allocated
+==22879== 
+==22879== LEAK SUMMARY:
+==22879==    definitely lost: 0 bytes in 0 blocks
+==22879==    indirectly lost: 0 bytes in 0 blocks
+==22879==      possibly lost: 0 bytes in 0 blocks
+==22879==    still reachable: 65 bytes in 3 blocks
+==22879==         suppressed: 0 bytes in 0 blocks
+==22879== Reachable blocks (those to which a pointer was found) are not shown.
+==22879== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==22879== 
+==22879== For counts of detected and suppressed errors, rerun with: -v
+==22879== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 IMPLEMENT ME: src/execute.c(line 118): check_jobs_bg_status()
-==14717== error calling PR_SET_PTRACER, vgdb might block
-==14717== 
-==14717== HEAP SUMMARY:
-==14717==     in use at exit: 177 bytes in 5 blocks
-==14717==   total heap usage: 38 allocs, 37 frees, 39,466 bytes allocated
-==14717== 
-==14717== 112 bytes in 2 blocks are definitely lost in loss record 4 of 4
-==14717==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14717==    by 0x10AD75: new_BG_job (execute.c:50)
-==14717==    by 0x10AE2B: new_destructable_BG_job (execute.c:50)
-==14717==    by 0x10CC0F: run_script (execute.c:514)
-==14717==    by 0x109A1E: main (quash.c:132)
-==14717== 
-==14717== LEAK SUMMARY:
-==14717==    definitely lost: 112 bytes in 2 blocks
-==14717==    indirectly lost: 0 bytes in 0 blocks
-==14717==      possibly lost: 0 bytes in 0 blocks
-==14717==    still reachable: 65 bytes in 3 blocks
-==14717==         suppressed: 0 bytes in 0 blocks
-==14717== Reachable blocks (those to which a pointer was found) are not shown.
-==14717== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==14717== 
-==14717== For counts of detected and suppressed errors, rerun with: -v
-==14717== ERROR SUMMARY: 5 errors from 3 contexts (suppressed: 0 from 0)
+==22889== 
+==22889== HEAP SUMMARY:
+==22889==     in use at exit: 75 bytes in 3 blocks
+==22889==   total heap usage: 45 allocs, 42 frees, 34,989 bytes allocated
+==22889== 
+==22889== LEAK SUMMARY:
+==22889==    definitely lost: 0 bytes in 0 blocks
+==22889==    indirectly lost: 0 bytes in 0 blocks
+==22889==      possibly lost: 0 bytes in 0 blocks
+==22889==    still reachable: 75 bytes in 3 blocks
+==22889==         suppressed: 0 bytes in 0 blocks
+==22889== Reachable blocks (those to which a pointer was found) are not shown.
+==22889== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==22889== 
+==22889== For counts of detected and suppressed errors, rerun with: -v
+==22889== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 IMPLEMENT ME: src/execute.c(line 118): check_jobs_bg_status()
-==14728== 
-==14728== HEAP SUMMARY:
-==14728==     in use at exit: 243 bytes in 6 blocks
-==14728==   total heap usage: 45 allocs, 45 frees, 35,141 bytes allocated
-==14728== 
-==14728== 168 bytes in 3 blocks are definitely lost in loss record 4 of 4
-==14728==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14728==    by 0x10AD75: new_BG_job (execute.c:50)
-==14728==    by 0x10AE2B: new_destructable_BG_job (execute.c:50)
-==14728==    by 0x10CC0F: run_script (execute.c:514)
-==14728==    by 0x109A1E: main (quash.c:132)
-==14728== 
-==14728== LEAK SUMMARY:
-==14728==    definitely lost: 168 bytes in 3 blocks
-==14728==    indirectly lost: 0 bytes in 0 blocks
-==14728==      possibly lost: 0 bytes in 0 blocks
-==14728==    still reachable: 75 bytes in 3 blocks
-==14728==         suppressed: 0 bytes in 0 blocks
-==14728== Reachable blocks (those to which a pointer was found) are not shown.
-==14728== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==14728== 
-==14728== For counts of detected and suppressed errors, rerun with: -v
-==14728== ERROR SUMMARY: 7 errors from 3 contexts (suppressed: 0 from 0)
 ERROR: Failed to execute program: No such file or directory
-==14634== 
-==14634== HEAP SUMMARY:
-==14634==     in use at exit: 280 bytes in 5 blocks
-==14634==   total heap usage: 57 allocs, 62 frees, 39,108 bytes allocated
-==14634== 
-==14634== 224 bytes in 4 blocks are definitely lost in loss record 2 of 2
-==14634==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14634==    by 0x10AD75: new_BG_job (execute.c:50)
-==14634==    by 0x10AE2B: new_destructable_BG_job (execute.c:50)
-==14634==    by 0x10CC0F: run_script (execute.c:514)
-==14634==    by 0x109A1E: main (quash.c:132)
-==14634== 
-==14634== LEAK SUMMARY:
-==14634==    definitely lost: 224 bytes in 4 blocks
-==14634==    indirectly lost: 0 bytes in 0 blocks
-==14634==      possibly lost: 0 bytes in 0 blocks
-==14634==    still reachable: 56 bytes in 1 blocks
-==14634==         suppressed: 0 bytes in 0 blocks
-==14634== Reachable blocks (those to which a pointer was found) are not shown.
-==14634== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==14634== 
-==14634== For counts of detected and suppressed errors, rerun with: -v
-==14634== ERROR SUMMARY: 11 errors from 3 contexts (suppressed: 0 from 0)
-==14733== 
-==14733== HEAP SUMMARY:
-==14733==     in use at exit: 288 bytes in 7 blocks
-==14733==   total heap usage: 57 allocs, 58 frees, 39,108 bytes allocated
-==14733== 
-==14733== 224 bytes in 4 blocks are definitely lost in loss record 4 of 4
-==14733==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14733==    by 0x10AD75: new_BG_job (execute.c:50)
-==14733==    by 0x10AE2B: new_destructable_BG_job (execute.c:50)
-==14733==    by 0x10CC0F: run_script (execute.c:514)
-==14733==    by 0x109A1E: main (quash.c:132)
-==14733== 
-==14733== LEAK SUMMARY:
-==14733==    definitely lost: 224 bytes in 4 blocks
-==14733==    indirectly lost: 0 bytes in 0 blocks
-==14733==      possibly lost: 0 bytes in 0 blocks
-==14733==    still reachable: 64 bytes in 3 blocks
-==14733==         suppressed: 0 bytes in 0 blocks
-==14733== Reachable blocks (those to which a pointer was found) are not shown.
-==14733== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==14733== 
-==14733== For counts of detected and suppressed errors, rerun with: -v
-==14733== ERROR SUMMARY: 9 errors from 3 contexts (suppressed: 0 from 0)
+==22896== 
+==22896== HEAP SUMMARY:
+==22896==     in use at exit: 64 bytes in 3 blocks
+==22896==   total heap usage: 57 allocs, 54 frees, 38,908 bytes allocated
+==22896== 
+==22896== LEAK SUMMARY:
+==22896==    definitely lost: 0 bytes in 0 blocks
+==22896==    indirectly lost: 0 bytes in 0 blocks
+==22896==      possibly lost: 0 bytes in 0 blocks
+==22896==    still reachable: 64 bytes in 3 blocks
+==22896==         suppressed: 0 bytes in 0 blocks
+==22896== Reachable blocks (those to which a pointer was found) are not shown.
+==22896== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==22896== 
+==22896== For counts of detected and suppressed errors, rerun with: -v
+==22896== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==22811== 
+==22811== HEAP SUMMARY:
+==22811==     in use at exit: 56 bytes in 1 blocks
+==22811==   total heap usage: 58 allocs, 57 frees, 38,916 bytes allocated
+==22811== 
+==22811== LEAK SUMMARY:
+==22811==    definitely lost: 0 bytes in 0 blocks
+==22811==    indirectly lost: 0 bytes in 0 blocks
+==22811==      possibly lost: 0 bytes in 0 blocks
+==22811==    still reachable: 56 bytes in 1 blocks
+==22811==         suppressed: 0 bytes in 0 blocks
+==22811== Reachable blocks (those to which a pointer was found) are not shown.
+==22811== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==22811== 
+==22811== For counts of detected and suppressed errors, rerun with: -v
+==22811== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

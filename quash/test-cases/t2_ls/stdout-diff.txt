@@ -1,9 +1,4 @@
-0a1,8
-> .
-> ..
-> dir1
-> dir2
-> dir3
-> lorem_ipsum.txt
+3d2
+< .valgrind_expected.txt
+7a7
 > .valgrind_expected.txt
-> valgrind_expected.txt

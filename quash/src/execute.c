@@ -70,6 +70,9 @@ static void _destroy_job(job_t b)
   destroy_piddeque(&b.process_list);
 }
 
+/*void destroy_pointers(job_t b){
+    _destroy_job(b);
+}*/
 BG_job bg_jobs;
 
 //delcaring pipes
@@ -87,13 +90,13 @@ char* get_current_directory(bool* should_free) {
   // HINT: This should be pretty simple
   //IMPLEMENT_ME();
   *should_free = true;
-  char* dbuff = getcwd(NULL, 0);
+  //char* dbuff = getcwd(NULL, 512);
   // Change this to true if necessary
   /*if (should_free==true){
     should_free = true;
   }*/
 
-  return dbuff;
+  return getcwd(NULL, 512);
 }
 
 // Returns the value of an environment variable env_var
@@ -160,11 +163,12 @@ void check_jobs_bg_status() {
       else if(next_process == curr_process){}
     }
 
-      if(is_empty_piddeque(&curr_job.process_list)){
+      if(!is_empty_piddeque(&curr_job.process_list))
+        push_back_BG_job(&bg_jobs,curr_job);
+      else{
         print_job_bg_complete(curr_job.job_id, first_process, curr_job.cmd);
         _destroy_job(curr_job);
       }
-      else push_back_BG_job(&bg_jobs,curr_job);
 
   }
 
@@ -262,8 +266,9 @@ void run_cd(CDCommand cmd) {
     return;
   }
   // TODO: Change directory
-  char realPath[PATH_MAX +1];
-  chdir (realpath(dir, realPath));
+  //char realPath[PATH_MAX +1];
+  //chdir (realpath(dir, realPath));
+  chdir(dir);
   // TODO: Update the PWD environment variable to be the new current working
   // directory and optionally update OLD_PWD environment variable to be the old
   // working directory.
@@ -296,7 +301,7 @@ void run_kill(KillCommand cmd) {
       }
     }
 
-    print_job(tempJob.job_id, peek_front_piddeque(&tempJob.process_list), tempJob.cmd);
+    //print_job(tempJob.job_id, peek_front_piddeque(&tempJob.process_list), tempJob.cmd);
 
     push_back_BG_job(&bg_jobs, tempJob);
   }
@@ -438,7 +443,7 @@ void parent_run_command(Command cmd) {
  *
  * @sa Command CommandHolder
  */
-void create_process(CommandHolder holder, job_t* curr_job) {
+void create_process(CommandHolder holder, job_t* curr_job, int currPipe) {
   // Read the flags field from the parser
   bool p_in  = holder.flags & PIPE_IN;
   bool p_out = holder.flags & PIPE_OUT;
@@ -447,11 +452,12 @@ void create_process(CommandHolder holder, job_t* curr_job) {
   bool r_app = holder.flags & REDIRECT_APPEND; // This can only be true if r_out
                                                // is true
 
-  pid_t pid;
+  pipeUsed = currPipe-1;
   if(p_out)
   {
     pipe(pipes[pipeUsed % 2]);
   }
+  pid_t pid;
   // TODO: Setup pipes, redirects, and new process
   pid = fork();
   if (pid == 0){
@@ -480,29 +486,31 @@ void create_process(CommandHolder holder, job_t* curr_job) {
     if(p_in){
       //make a copy
       //pipe[][0]
-      close(pipes[pipeUsed % 2][1]);
       dup2(pipes[pipeUsed % 2][0], STDIN_FILENO);
+      close(pipes[pipeUsed % 2][1]);
     }
 
     if(p_out){
-      close(pipes[pipeUsed % 2][0]);
       dup2(pipes[pipeUsed % 2][1], STDOUT_FILENO);
+      close(pipes[pipeUsed % 2][0]);
     }
 
-
+    //_destroy_job(this->curr_job);
+    //destroy_pointers(curr_job);
     child_run_command(holder.cmd);
     //destroy the job
     exit (EXIT_SUCCESS);
   }
   else{
-      if(p_out)
-      {
-        close(pipes[pipeUsed % 2][0]);
-      }
-      pipeUsed++;
-      //push_back_piddeque(&curr_job->process_list, pid);
-      parent_run_command(holder.cmd);
+    push_back_piddeque(&curr_job->process_list, pid);
+    parent_run_command(holder.cmd);
     }
+  if(p_in)
+  {
+    close(pipes[pipeUsed % 2][0]);
+    close(pipes[pipeUsed % 2][1]);
+  }
+  //pipeUsed++;
 
   /*  if(p_in){
       //pipe[][0]
@@ -518,9 +526,13 @@ void create_process(CommandHolder holder, job_t* curr_job) {
 void run_script(CommandHolder* holders) {
   if (holders == NULL)
     return;
+  static bool newScript = true;
+  if (newScript){
+    bg_jobs = new_destructable_BG_job(1, _destroy_job);
+    newScript = false;
+  }
 
-  bg_jobs = new_destructable_BG_job(1, _destroy_job);
-
+  job_t curr_job = _new_job();
 
   check_jobs_bg_status();
 
@@ -533,12 +545,10 @@ void run_script(CommandHolder* holders) {
   CommandType type;
   //create a new job to hold the current job, call the constructor
   //job_t curr_job = pop_front_BG_job(&bg_jobs);
-  job_t curr_job = _new_job();
 
   // Run all commands in the `holder` array
   for (int i = 0; (type = get_command_holder_type(holders[i])) != EOC; ++i){
-    create_process(holders[i], &curr_job);
-    _destroy_job(curr_job);
+    create_process(holders[i], &curr_job, i);
   }
 
   if (!(holders[0].flags & BACKGROUND)) {
@@ -546,9 +556,9 @@ void run_script(CommandHolder* holders) {
     // TODO: Wait for all processes under the job to complete
     //need another wait (waitpid) to wait the perfect amount of time
     while (!is_empty_piddeque(&curr_job.process_list)){
-    pid_t curr_process = pop_back_piddeque(&curr_job.process_list);
-    int status = 0;
-    waitpid(curr_process, &status, 0);
+      pid_t curr_process = pop_front_piddeque(&curr_job.process_list);
+      int status = 0;
+      waitpid(curr_process, &status, 0);
     }
     free(curr_job.cmd);
     destroy_piddeque(&curr_job.process_list);
@@ -559,7 +569,7 @@ void run_script(CommandHolder* holders) {
     if(is_empty_BG_job(&bg_jobs)) curr_job.job_id = 1;
     else curr_job.job_id = peek_back_BG_job(&bg_jobs).job_id + 1;
 
-    curr_job.cmd = get_command_string();
+    //curr_job.cmd = get_command_string();
 
     // TODO: Push the new job to the job queue
     //figure out new job ID and push it to the back of the job queue and print that the background job has started
@@ -571,4 +581,5 @@ void run_script(CommandHolder* holders) {
     //print the first element in the pid q (which what peek returns)
     print_job_bg_start(curr_job.job_id,peek_front_piddeque(&curr_job.process_list), curr_job.cmd);
   }
+  //_destroy_job(curr_job);
 }

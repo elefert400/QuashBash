@@ -30,7 +30,7 @@ DOXYGENCONF = quash.doxygen
 SRCDIR = ./src/
 OBJDIR = ./obj/
 
-EXECNAME = $(patsubst %,./%,$(PROGNAME))
+EXECNAME = $(patsubst %,../%,$(PROGNAME))
 
 CFILES = $(patsubst %,$(SRCDIR)%,$(CFILELIST))
 HFILES = $(patsubst %,$(SRCDIR)%,$(HFILELIST))
