@@ -66,10 +66,16 @@ static job_t _new_job()
 static void _destroy_job(job_t b)
 {
   //getting the size and using it and the destructor to deallocate the process dequeue
-  if(b.cmd != NULL) free(b.cmd);
+  if(b.cmd != NULL) {free(b.cmd);}
   destroy_piddeque(&b.process_list);
 }
 
+static void destroy_job(job_t* b)
+{
+  //getting the size and using it and the destructor to deallocate the process dequeue
+  if(b->cmd != NULL) free(b->cmd);
+  destroy_piddeque(&b->process_list);
+}
 /*void destroy_pointers(job_t b){
     _destroy_job(b);
 }*/
@@ -118,7 +124,7 @@ void check_jobs_bg_status() {
   // TODO: Check on the statuses of all processes belonging to all background
   // jobs. This function should remove jobs from the jobs queue once all
   // processes belonging to a job have completed.
-  IMPLEMENT_ME();
+  //IMPLEMENT_ME();
 
   // first check if there is a background job:
   if (is_empty_BG_job(&bg_jobs)) {
@@ -326,7 +332,7 @@ void run_pwd() {
 // Prints all background jobs currently in the job list to stdout
 void run_jobs() {
   // TODO: Print background jobs
-  IMPLEMENT_ME();
+  //IMPLEMENT_ME();
   //if (is_empty_BG_job(&bg_jobs)) return;
   // if there is a background job:
   int length = length_BG_job(&bg_jobs);
@@ -457,7 +463,7 @@ void create_process(CommandHolder holder, job_t* curr_job, int currPipe) {
   pipeUsed = currPipe-1;
   if(p_out)
   {
-    pipe(pipes[pipeUsed % 2]);
+    pipe(pipes[currPipe % 2]);
   }
   pid_t pid;
   // TODO: Setup pipes, redirects, and new process
@@ -482,6 +488,7 @@ void create_process(CommandHolder holder, job_t* curr_job, int currPipe) {
       dup2(fileno(newFile), STDOUT_FILENO);
       //because we are using a file fclose()
       fclose(newFile);
+      //newFile = (char*) malloc(size);
     }
     // I have no clue how to do this or any pipe thing SORRY!!!
     //if pipe in
@@ -493,15 +500,18 @@ void create_process(CommandHolder holder, job_t* curr_job, int currPipe) {
     }
 
     if(p_out){
-      dup2(pipes[pipeUsed % 2][1], STDOUT_FILENO);
-      close(pipes[pipeUsed % 2][0]);
+      dup2(pipes[currPipe % 2][1], STDOUT_FILENO);
+      close(pipes[currPipe % 2][0]);
     }
 
     //_destroy_job(this->curr_job);
     //destroy_pointers(curr_job);
+    destroy_job(curr_job);
     child_run_command(holder.cmd);
     //destroy the job
-    exit (EXIT_SUCCESS);
+    exit (0);
+    //free(curr_job);
+
   }
   else{
     push_back_piddeque(&curr_job->process_list, pid);
@@ -512,17 +522,6 @@ void create_process(CommandHolder holder, job_t* curr_job, int currPipe) {
     close(pipes[pipeUsed % 2][0]);
     close(pipes[pipeUsed % 2][1]);
   }
-  //pipeUsed++;
-
-  /*  if(p_in){
-      //pipe[][0]
-      dup2(pipes[pipeUsed % 2][0], STDIN_FILENO);
-      close(pipes[pipeUsed % 2][1]);
-      pipeUsed++;
-      close(pipes[pipeUsed % 2][0]);
-      close(pipes[pipeUsed % 2][1]);
-      //push the process to the front of the q
-    }*/
 }
 // Run a list of commands
 void run_script(CommandHolder* holders) {
@@ -561,15 +560,13 @@ void run_script(CommandHolder* holders) {
       pid_t curr_process = pop_front_piddeque(&curr_job.process_list);
       int status = 0;
       waitpid(curr_process, &status, 0);
+
     }
-    if(is_empty_piddeque(&curr_job.process_list))
-    {
       _destroy_job(curr_job);
-    }
+
   }
   else {
     // A background job.
-
     if(is_empty_BG_job(&bg_jobs)) curr_job.job_id = 1;
     else curr_job.job_id = peek_back_BG_job(&bg_jobs).job_id + 1;
 

@@ -1,6 +1,8 @@
-STUDENTID = XXXXXXX
-PROGNAME = quash
+STUDENTID = 2943303
+#STUDENTID = 2819123
+## Ayah Alkhatib & Ethan Leferet have worked on this project
 
+PROGNAME = quash
 CC = gcc --std=gnu11
 CFLAGS = -Wall -g
 
